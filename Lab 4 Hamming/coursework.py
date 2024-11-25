@@ -68,9 +68,15 @@ def parity_matrix(m : int) -> np.ndarray:
     return : np.ndarray
       m-by-n parity check matrix
     """
+    n = 2 ** m - 1 
+    H = []
 
-    raise NotImplementedError
+    for index in range(1, n + 1):
+        binary_string = format(index, "b").zfill(m)
+        binary_list = list( map(int, binary_string) )
+        H.append( binary_list ) 
 
+    return np.array(H).T[::-1]
 
 def hamming_generator(m : int) -> np.ndarray:
     """
@@ -80,8 +86,35 @@ def hamming_generator(m : int) -> np.ndarray:
     return : np.ndarray
       k-by-n generator matrix
     """
+    def is_data_bit(index: int) -> bool: 
+        return (index & (index - 1)) == 0
+    
+    n = 2 ** m - 1 
+    k = n - m 
 
-    raise NotImplementedError
+    H = parity_matrix(m)
+    H_T = H.T
+
+    data_indices =  [ 
+        index - 1 for index in range(1, n + 1) 
+        if not is_data_bit(index)
+    ]
+    
+    data_bits = H_T[data_indices].T
+
+    G_T = []
+    identity_matrix = np.eye(k, dtype=int)
+    data_idex, identity_idex = 0, 0
+
+    for index in range(1, n + 1): 
+        G_T.append(
+            data_bits[data_idex] if is_data_bit(index)
+            else identity_matrix[identity_idex]
+        )
+        data_idex += is_data_bit(index)
+        identity_idex += not is_data_bit(index)
+
+    return np.array(G_T).T
 
 
 def hamming_encode(data : np.ndarray, m : int) -> np.ndarray:
@@ -95,9 +128,12 @@ def hamming_encode(data : np.ndarray, m : int) -> np.ndarray:
     return : np.ndarray
       array of shape (n,) with the corresponding Hamming codeword
     """
-    assert( data.shape[0] == 2**m - m - 1 )
-
-    raise NotImplementedError
+    assert( data.shape[0] == 2 ** m - m - 1 )
+    
+    G = hamming_generator(m) 
+    codeword = np.dot(G.T, data) % 2 
+    
+    return np.array(codeword).astype(int)
 
 
 def hamming_decode(code : np.ndarray, m : int) -> np.ndarray:
@@ -112,7 +148,22 @@ def hamming_decode(code : np.ndarray, m : int) -> np.ndarray:
     """
     assert(np.log2(len(code) + 1) == int(np.log2(len(code) + 1)) == m)
 
-    raise NotImplementedError
+    H = parity_matrix(m)
+    k = 2 ** m - m - 1
+    
+    z = np.dot(H, code) % 2
+
+    if not all(z[index] == 0 for index in range(0, m)):
+        error_position = int("".join(map(str, z[::-1])), 2) - 1
+        code[error_position] ^= 1
+        print("error position: ", error_position)
+
+    data_indices =  [ 
+        index - 1 for index in range(1, m + k + 1) 
+        if not (index & (index - 1)) == 0
+    ]
+
+    return code[data_indices]
 
 
 def decode_secret(msg : np.ndarray) -> str:
@@ -123,9 +174,26 @@ def decode_secret(msg : np.ndarray) -> str:
     return : str
       String with decoded text
     """
-    m = np.nan  # <-- Your guess goes here
+    m = 4  # <-- Your guess goes here
+    n = 2 ** m - 1 
+    
+    if len(msg) % n != 0:
+        raise ValueError("Message length is not a multiple of codeword length.")
+    
+    codeword_chunks = np.split(msg, len(msg) // n)
+    
+    decoded_bits = []
+    for codeword in codeword_chunks:
+        decoded_chunk = hamming_decode(codeword, m)
+        decoded_bits.extend(decoded_chunk)
 
-    raise NotImplementedError
+    text = bits2text(np.array(decoded_bits))
+
+    if len(text.strip()) > 0: 
+        print(f"Decoded successfully with m = {m} \n")
+        return text
+
+    return ValueError(f"Decode was unsuccessful with m = {m}")   
 
 
 def binary_symmetric_channel(data : np.ndarray, p : float) -> np.ndarray:
