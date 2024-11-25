@@ -156,7 +156,6 @@ def hamming_decode(code : np.ndarray, m : int) -> np.ndarray:
     if not all(z[index] == 0 for index in range(0, m)):
         error_position = int("".join(map(str, z[::-1])), 2) - 1
         code[error_position] ^= 1
-        print("error position: ", error_position)
 
     data_indices =  [ 
         index - 1 for index in range(1, m + k + 1) 
@@ -178,7 +177,7 @@ def decode_secret(msg : np.ndarray) -> str:
     n = 2 ** m - 1 
     
     if len(msg) % n != 0:
-        raise ValueError("Message length is not a multiple of codeword length.")
+        raise ValueError(f"Message length is not a multiple of codeword length({n}).")
     
     codeword_chunks = np.split(msg, len(msg) // n)
     
@@ -206,8 +205,10 @@ def binary_symmetric_channel(data : np.ndarray, p : float) -> np.ndarray:
     return : np.ndarray
       data with a number of bits flipped
     """
-
-    raise NotImplementedError
+    random_values = np.random.rand(data.size)
+    flip_mask = random_values < p
+    flipped_data = np.bitwise_xor(data, flip_mask.astype(int))
+    return flipped_data
 
 
 def decoder_accuracy(m : int, p : float) -> float:
@@ -221,6 +222,21 @@ def decoder_accuracy(m : int, p : float) -> float:
       The probability of messages being correctly decoded with this
       Hamming code, using the noisy channel of probability p
     """
+    n = 2 ** m - 1 
+    k = n - m 
 
-    raise NotImplementedError
+    num_tests = 10000
+    successful_decodings = 0
+
+    for _ in range(num_tests):
+        original_message = np.random.randint(0, 2, size=k)
+        encoded_message = hamming_encode(original_message, m)
+        noisy_message = binary_symmetric_channel(encoded_message, p)
+        decoded_message = hamming_decode(noisy_message, m)
+
+        if np.array_equal(decoded_message, original_message):
+            successful_decodings += 1
+
+    accuracy = successful_decodings / num_tests
+    return accuracy
 

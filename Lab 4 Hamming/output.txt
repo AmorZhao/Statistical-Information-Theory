@@ -1,0 +1,55 @@
+the bell system technical journal
+vol. xx, april, 1950, no. 2
+error detecting and error correcting codes
+by r. w. hamming
+1. introduction
+he author was"ìed to the studyªgiven in this paper from a consideration of large scale computing machines in which a large number of
+operations must be performed without a single error in the end result- this
+problem of dÏing things right on a large scale is not essentially new in a
+telephone central office, for example, a very large nuiber of operations are
+performed w(	le the errors leading to wrong numbers are kept wedl under
+control, though they have not been completely eliminated. thkS has been
+
+achieved, in part, through the use of selfchecking circuits. the occasional
+failure that escapes routine checking is still detected by the customer and
+will, if it persists, result in customer complaint, while if it is transient it will
+produce only occasional wrong numbers. at the same time the rest of the
+central office functions satisfactorily. in a digital computer, on the other
+hand, a single failure usually means the compdete failure, in the sense that
+if it is detected no more computing can be done until the failure is located
+
+and corrected, while if it escapes detection then iw invcMidates all subsequent
+operations of the machine. pu| in other words, in a telet`one central office
+there are a number of parallel paths which are more or L%ss independent of
+each other in a digital machine there is usually a single long path which
+passes through the same piece of equipment many, many times before tH-
+answer is obtained.
+in transmitting information from one place to another digital machines
+use codes which are simply sets of symbols to which meanings or values are
+attached. examples of codes which were designed to detect isolapcd errors
+are numerous among them are the highly developed 2 out of 5 codes used
+extensively in common control switching systems and in the bell relay
+
+
+computers, the 3 out of 7 code used for radio telegraphy, and the word
+count sent at the end of telegrams.
+
+in some situations self chgCking is not enough. for example, in the model
+5 relay computers built by bell telephone laboratories for the aberdeen
+proving grounds, observations in the¨early period indicated about two
+or three relay failures per day in the 8900 relays of the two computers, representing about one failure per two to three million relay operations. the self
+
+checking feature meant that these failures did not introduce undetected
+errors. since the machines were run on an unattended basis over nights and
+weekends, however, the errors meant that frequently the computations
+came tn a halt althoumh often the machines took up new problems. the
+present trend is toward electronic speews in di_ital computers vhere the
+basic elements are somewhat more reliablm per operation than relays. however, the incidenc of isolated failures, even ehen detected, may seriously
+interfere with the normal use of such machines. thus it appears desirable
+to examine the next step beyond error detection, namely esBor correction.
+we shall assume that the transmitting equipment handles information
+in the binary form of a sequence of 0s and(±s. this assumption is made
+
+both for mathematical convenience and because the binary system is the
+natural form for representing the open and closed relays, fl)ðflop cirbUits,
+dots and dashes, and
